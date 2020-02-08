@@ -1,15 +1,15 @@
 NPM packages dependency tree calculator.
 
-Supported APIs:
+**Supported APIs:**
 * /packages/:packageName/:packageVersion/dependencies
 
-Installation:
+**Installation:**
 npm install
 
-Start the app:
+**Start the app:**
 npm start
 
-Listens on port 8080 by default
+**Listens on port 8080 by default**
 
-Run the tests:
+**Run the tests:**
 npm test
