@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha tests --recursive",
-    "start": "node server.js"
+    "start": "node app/server.js"
   },
   "repository": {
     "type": "git",
