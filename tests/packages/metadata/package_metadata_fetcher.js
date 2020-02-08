@@ -8,7 +8,7 @@ const PackageMetadata = require('../../../app/packages/metadata/package_metadata
 const PackageMetadataFetcher = require('../../../app/packages/metadata/package_metadata_fetcher');
 
 describe('package metadata fetcher tests', () => {
-    it.only('fetch package, attempt to fetch again will retrieve from cache', async () => {
+    it('fetch package, attempt to fetch again will retrieve from cache', async () => {
 
         const scope = nock(PackageMetadataFetcher.BASE_URL)
             .get('/package3/1.1.1')
