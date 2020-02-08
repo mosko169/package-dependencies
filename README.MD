@@ -6,5 +6,7 @@ Supported APIs:
 Start the app:
 npm start
 
+Listens on port 8080 by default
+
 Run the tests:
 npm test
