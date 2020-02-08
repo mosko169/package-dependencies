@@ -6,7 +6,7 @@ const LRUCache = require('lru-cache');
 const PACKAGES_CACHE_SIZE = 100;
 const PACKAGE_CACHE_MAX_AGE = 10000; // in MS
 
-const BASE_URL = 'https://registry.npmjs.org'
+const BASE_URL = 'https://registry.npmjs.org';
 
 const HTTP_STATUS_CODE_200_OK = 200;
 
@@ -55,14 +55,14 @@ class PackageMetadataFetcher {
 
         let cachedMetadata = this._packagesCache.get(packageId);
         if (!cachedMetadata) {
-            cachedMetadata = await this._fetchPackageMetadataFromSource(name, version);
+            cachedMetadata = await this.fetchPackageMetadataFromSource(name, version);
             this._packagesCache.set(packageId, cachedMetadata);
         }
 
         return cachedMetadata;
     }
 
-    async _fetchPackageMetadataFromSource(name, version) {
+    async fetchPackageMetadataFromSource(name, version) {
         let requestOptions = {
             url: urljoin(BASE_URL, name, version),
             json: true,
@@ -80,4 +80,5 @@ class PackageMetadataFetcher {
     }
 }
 
+PackageMetadataFetcher.BASE_URL = BASE_URL;
 module.exports = PackageMetadataFetcher;
