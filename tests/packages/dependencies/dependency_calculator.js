@@ -49,7 +49,7 @@ describe('dependency calculator tests', () => {
         assert.equal(Object.keys(package1Deps).length, 0);
     });
 
-    it('test dependencies calculation, dependency failed will continue', async () => {
+    it('test dependencies calculation, dependency failed - will continue', async () => {
         let package1 = new PackageMetadata("package1", "1.1.1", []);
         let package2 = new PackageMetadata("package2", "1.1.1", []);
         let package3 = new PackageMetadata("package3", "1.1.1", [{name: package2.name, version: package2.version}]);
@@ -62,7 +62,9 @@ describe('dependency calculator tests', () => {
         // simulate failure in fetching package 3 metadata
         depMetadataFetcher.fetchPackageMetadata = (packageName) => {
             if (packageName == package3.name) {
-                throw new Error("failed to fetch dep");
+                let err = new Error("failed to fetch dep");
+                err.stack = "";
+                throw err;
             }
             return originalFetchPackageMetadataFunc.call(depMetadataFetcher, packageName);
         }

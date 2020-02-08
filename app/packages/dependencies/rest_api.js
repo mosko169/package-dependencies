@@ -11,10 +11,10 @@ function getDependenciesRouter() {
     const depCalculator = new DependencyCalculator(depMetadataFetcher);
 
     let router = express.Router();
-    router.get('/:packageName/:packageVersion', async (req, res) => {
+    router.get('/', async (req, res) => {
         try {
-            let packageName = req.params.packageName;
-            let packageVersion = req.params.packageVersion;
+            let packageName = req.packageName;
+            let packageVersion = req.packageVersion;
             
             let depTree = await depCalculator.getPackageDependenciesTree(packageName, packageVersion);
             res.send(depTree);

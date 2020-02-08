@@ -76,7 +76,7 @@ class PackageMetadataFetcher {
      * @note    Minimal logic was implemented due to lack of time :(
      */
     parseDependencyVersion(rawVersion) {
-        if (rawVersion.startsWith("~")) {
+        if (rawVersion.startsWith("~") || rawVersion.startsWith("^")) {
             rawVersion = rawVersion.substr(1);
         }
         let version = semver.parse(rawVersion);

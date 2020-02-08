@@ -1,6 +1,6 @@
 
 /**
- * Basic Package Metadata struct
+ * Basic package metadata struct
  */
 class PackageMetadata {
     constructor(packageName, packageVersion, dependencies = []) {
