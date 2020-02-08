@@ -3,8 +3,10 @@ const express = require('express');
 const DependencyCalculator = require('./dependency_calculator');
 const DependencyMetadataFetcher = require('../metadata/package_metadata_fetcher');
 
+/**
+ * API Router for package dependencies operations
+ */
 function getDependenciesRouter() {
-
     let depMetadataFetcher = new DependencyMetadataFetcher();
     const depCalculator = new DependencyCalculator(depMetadataFetcher);
 

@@ -1,4 +1,7 @@
 
+/**
+ * Basic Package Metadata struct
+ */
 class PackageMetadata {
     constructor(packageName, packageVersion, dependencies = []) {
         this.name = packageName;

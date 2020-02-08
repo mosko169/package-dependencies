@@ -15,6 +15,11 @@ class DependencyCalculator {
         this.packageMetadataFetcher = packageMetadataFetcher;
     }
     
+    /**
+     * Retrieves the dependencies tree of a given package
+     * @param {String} name - name of package
+     * @param {String} version - version of package
+     */
     async getPackageDependenciesTree(name, version) {
         let packageDependencies = await this._fetchPackageDependencies(name, version);
         let dependencyTreeNode = new DependencyTreeNode(name, version);
