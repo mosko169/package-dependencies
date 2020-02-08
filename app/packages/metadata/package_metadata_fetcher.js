@@ -41,7 +41,7 @@ class PackageMetadataFetcher {
             if (!depVersion) {
                 console.warn("failed to parse required version of package", depName, ". raw version recieved:", dependencies[depName]);
             }
-            parsedDependencies.push(new PackageMetadata(depName, depVersion));
+            parsedDependencies.push({name: depName, version: depVersion});
         }
         return parsedDependencies;
     }

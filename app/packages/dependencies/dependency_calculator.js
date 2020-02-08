@@ -22,6 +22,8 @@ class DependencyCalculator {
             try {
                 dependencyTreeNode.dependencies[dependency.name] = await this.getPackageDependenciesTree(dependency.name, dependency.version);
             } catch (err) {
+                // if failed to fetch dependency tree, just return the dependency itself
+                dependencyTreeNode.dependencies[dependency.name] = new DependencyTreeNode(name, version);
                 console.warn("Failed to fetch dependencies of package", dependency.name, "in version", dependency.version, ", error:", err);
             }
         })
