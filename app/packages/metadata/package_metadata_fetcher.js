@@ -3,6 +3,7 @@ const urljoin = require('url-join');
 const semver = require('semver');
 const LRUCache = require('lru-cache');
 
+const log = require('../../common/logger');
 const PackageMetadata = require('./package_metadata');
 
 // Amount of package metadata records that can exist in the cache at a given time
@@ -58,12 +59,13 @@ class PackageMetadataFetcher {
         let requestOptions = {
             url: urljoin(BASE_URL, name, version),
             json: true,
-            resolveWithFullResponse: true
+            resolveWithFullResponse: true,
+            simple: false
         }
     
         let response = await request(requestOptions);
         if (response.statusCode != HTTP_STATUS_CODE_200_OK) {
-            throw new Error('failed to fetch dependencies, invalid http response status code recieved:', response.statusCode);
+            throw new Error('failed to fetch dependencies of ' + name + ' with version ' + version + ', invalid http response status code recieved: ' + response.statusCode);
         }
         
         let dependencies = response.body.dependencies || {};
@@ -92,7 +94,7 @@ class PackageMetadataFetcher {
         for (let depName in dependencies) {
             let depVersion = this.parseDependencyVersion(dependencies[depName]);
             if (!depVersion) {
-                console.warn("failed to parse required version of package", depName, ". raw version recieved:", dependencies[depName]);
+                log.warn("failed to parse required version of package " + depName + ". raw version recieved: " + dependencies[depName]);
             }
             parsedDependencies.push({name: depName, version: depVersion});
         }

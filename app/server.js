@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyparser = require('body-parser');
 
+const log = require('./common/logger');
+
 const packagesAPI = require('./packages/rest_api')();
 
 async function main() {
@@ -12,7 +14,7 @@ async function main() {
 
     app.use('/packages', packagesAPI);
     
-    console.info("starting server");
+    log.info("starting server");
     app.listen(8080);
 }
 
