@@ -1,27 +1,25 @@
-
 const request = require('request-promise');
 const urljoin = require('url-join');
 const semver = require('semver');
-const Bluebird = require('bluebird');
+const LRUCache = require('lru-cache');
 
-const PackageMetadata = require('./package_metadata');
+const PACKAGES_CACHE_SIZE = 100;
+const PACKAGE_CACHE_MAX_AGE = 10000; // in MS
 
 const BASE_URL = 'https://registry.npmjs.org'
 
 const HTTP_STATUS_CODE_200_OK = 200;
 
+const PackageMetadata = require('./package_metadata');
 
-
-class DependencyTreeNode {
-    constructor(packageMetadata, dependencies = {}) {
-        this.packageMetadata = packageMetadata;
-        this.dependencies = dependencies;
+class PackageMetadataFetcher {
+    constructor(options = {}) {
+        this._packagesCache = new LRUCache({max: PACKAGES_CACHE_SIZE,
+                                            maxAge: PACKAGE_CACHE_MAX_AGE});
     }
-}
 
-class DependencyCalculator {
-    constructor() {
-        
+    static _getPackageId(name, version) {
+        return name + "::" + version;
     }
 
     parseDependencyVersion(rawVersion) {
@@ -47,14 +45,26 @@ class DependencyCalculator {
         }
         return parsedDependencies;
     }
-    
-    async _fetchPackageDependencies(packageMetadata) {
-        if (!packageMetadata.version) {
+
+    async fetchPackageMetadata(name, version) {
+        if (!version) {
             return [];
         }
-    
+
+        let packageId = PackageMetadataFetcher._getPackageId(name, version);
+
+        let cachedMetadata = this._packagesCache.get(packageId);
+        if (!cachedMetadata) {
+            cachedMetadata = await this._fetchPackageMetadataFromSource(name, version);
+            this._packagesCache.set(packageId, cachedMetadata);
+        }
+
+        return cachedMetadata;
+    }
+
+    async _fetchPackageMetadataFromSource(name, version) {
         let requestOptions = {
-            url: urljoin(BASE_URL, packageMetadata.name, packageMetadata.version),
+            url: urljoin(BASE_URL, name, version),
             json: true,
             resolveWithFullResponse: true
         }
@@ -63,28 +73,11 @@ class DependencyCalculator {
         if (response.statusCode != HTTP_STATUS_CODE_200_OK) {
             throw new Error('failed to fetch dependencies, invalid http response status code recieved:', response.statusCode);
         }
-    
+        
         let dependencies = response.body.dependencies || {};
-        return this.parseRawDependencies(dependencies);
+        dependencies = this.parseRawDependencies(dependencies);
+        return new PackageMetadata(name, version, dependencies);
     }
-    
-    getDependencyId(packageMetadata) {
-        return packageMetadata.name + "::" + packageMetadata.version;
-    }
-    
-    async getPackageDependenciesTree(packageMetadata) {
-        let packageDependencies = await this._fetchPackageDependencies(packageMetadata);
-        let dependencyTreeNode = new DependencyTreeNode(packageMetadata);
-        await Bluebird.map(packageDependencies, async dependency => {
-            try {
-                dependencyTreeNode.dependencies[dependency.name] = await this.getPackageDependenciesTree(dependency);
-            } catch (err) {
-                console.warn("Failed to fetch dependencies of package", dependency.name, "in version", dependency.version, ", error:", err);
-            }
-        })
-    
-        return dependencyTreeNode;
-    }    
 }
 
-module.exports = DependencyCalculator;
+module.exports = PackageMetadataFetcher;

@@ -1,12 +1,12 @@
 const express = require('express');
 
 const DependencyCalculator = require('./dependency_calculator');
-const PackageMetadata = require('./package_metadata');
-
+const DependencyMetadataFetcher = require('../metadata/package_metadata_fetcher');
 
 function getDependenciesRouter() {
 
-    const depCalculator = new DependencyCalculator();
+    let depMetadataFetcher = new DependencyMetadataFetcher();
+    const depCalculator = new DependencyCalculator(depMetadataFetcher);
 
     let router = express.Router();
     router.get('/:packageName/:packageVersion', async (req, res) => {
@@ -14,9 +14,10 @@ function getDependenciesRouter() {
             let packageName = req.params.packageName;
             let packageVersion = req.params.packageVersion;
             
-            let depTree = await depCalculator.getPackageDependenciesTree(new PackageMetadata(packageName, packageVersion));
+            let depTree = await depCalculator.getPackageDependenciesTree(packageName, packageVersion);
             res.send(depTree);
         } catch (err) {
+            console.error(err);
             res.send("An error has occured! " + err.message);
             res.status(500);
         }
